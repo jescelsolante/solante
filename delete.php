@@ -1,14 +1,10 @@
 <?php
-include 'db.php';
-
-if (isset($_GET['id'])) {
-    $id = $_GET['id'];
-    $sql = "DELETE FROM students WHERE id=$id";
-
-    if ($conn->query($sql) === TRUE) {
-        header("Location: index.php?message=Student+deleted+successfully!");
+    require_once "conn.php";
+    $id = $_GET["id"];
+    $query = "DELETE FROM results WHERE id = '$id'";
+    if (mysqli_query($conn, $query)) {
+        header("location: index.php");
     } else {
-        header("Location: index.php?message=Error+deleting+record");
+         echo "Something went wrong. Please try again later.";
     }
-}
-exit;
+?>
