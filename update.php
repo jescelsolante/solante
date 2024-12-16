@@ -1,81 +1,79 @@
-<?php
-include 'db.php';
-
-$id = $_GET['id']; // Get the student ID from the URL
-
-// Fetch the student's current data to display in the form
-$sql = "SELECT * FROM students WHERE id = $id";
-$result = $conn->query($sql);
-$student = $result->fetch_assoc();
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Collect updated data from the form
-    $firstname = $_POST['firstname'];
-    $middlename = $_POST['middlename'];
-    $lastname = $_POST['lastname'];
-    $age = $_POST['age'];
-    $address = $_POST['address'];
-    $course = $_POST['course'];
-    $section = $_POST['section'];
-
-    // SQL query to update the student's data in the database
-    $sql = "UPDATE students SET firstname='$firstname', middlename='$middlename', lastname='$lastname', age='$age', address='$address', course='$course', section='$section' WHERE id=$id";
-
-    // Execute the update query
-    if ($conn->query($sql) === TRUE) {
-        // Redirect to the student list page after a successful update
-        header("Location: index.php");
-        exit(); // Make sure to exit after a header redirect
-    } else {
-        // Display an error message if the update fails
-        echo "<div class='message error'>Error updating record: " . $conn->error . "</div>";
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
+<?php
+    require_once "conn.php";
+    if(isset($_POST["name"]) && isset($_POST["grade"]) && isset($_POST["marks"])){
+        $name = $_POST['name'];
+        $grade = $_POST['grade'];
+        $marks = $_POST['marks'];
+        $sql = "UPDATE results SET `name`= '$name', `class`= '$grade', `marks`= $marks  WHERE id= ".$_GET["id"];
+        if (mysqli_query($conn, $sql)) {
+            header("location: index.php");
+        } else {
+            echo "Something went wrong. Please try again later.";
+        }
+    }
+?>
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update Student</title>
-    <link rel="stylesheet" href="style.css">
+    <title>PHP - MYSQL - CRUD</title>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+        crossorigin="anonymous"></script>
 </head>
-<body>
-<div class="containers">
-    <h2>Update Student</h2>
 
-    <form method="POST">
-        <table>
-            <tr>
-                <td><input type="text" name="firstname" value="<?php echo $student['firstname']; ?>" required></td>
-            </tr>
-            <tr>
-                <td><input type="text" name="middlename" value="<?php echo $student['middlename']; ?>" required></td>
-            </tr>
-            <tr>
-                <td><input type="text" name="lastname" value="<?php echo $student['lastname']; ?>" required></td>
-            </tr>
-            <tr>
-                <td><input type="number" name="age" value="<?php echo $student['age']; ?>" required></td>
-            </tr>
-            <tr>
-                <td><input type="text" name="address" value="<?php echo $student['address']; ?>" required></td>
-            </tr>
-            <tr>
-                <td><input type="text" name="course" value="<?php echo $student['course']; ?>" required></td>
-            </tr>
-            <tr>
-                <td><input type="text" name="section" value="<?php echo $student['section']; ?>" required></td>
-            </tr>
-            <tr>
-                <td colspan="2" style="text-align: center;">
-                    <button type="submit">Update Student</button>  <br> <br>
-                    <a href="index.php" class="add-button1">Student List</a>
-                </td>
-            </tr>
-        </table>   
-    </form>
-</div>
+<body>
+    <section>
+        <h1 style="text-align: center;margin: 50px 0;">Update Data</h1>
+        <div class="container">
+            <?php 
+                require_once "conn.php";
+                $sql_query = "SELECT * FROM results WHERE id = ".$_GET["id"];
+                if ($result = $conn ->query($sql_query)) {
+                    while ($row = $result -> fetch_assoc()) { 
+                        $Id = $row['id'];
+                        $Name = $row['name'];
+                        $Grade = $row['class'];
+                        $Marks = $row['marks'];
+            ?>
+                            <form action="updatedata.php?id=<?php echo $Id; ?>" method="post">
+                                <div class="row">
+                                        <div class="form-group col-lg-4">
+                                            <label for="">Student Name</label>
+                                            <input type="text" name="name" id="name" class="form-control" value="<?php echo $Name ?>" required>
+                                        </div>
+                                        <div class="form-group  col-lg-3">
+                                            <label for="">Grade</label>
+                                            <select name="grade" id="grade" class="form-control" required >
+                                                <option value="">Select a Grade</option>
+                                                <option value="grade6" <?php if($Grade == "grade6"){ echo "Selected"; } ?> >Grade 6</option>
+                                                <option value="grade7" <?php if($Grade == "grade7"){ echo "Selected"; } ?> >Grade 7</option>
+                                                <option value="grade8" <?php if($Grade == "grade8"){ echo "Selected"; } ?> >Grade 8</option>
+                                                <option value="grade9" <?php if($Grade == "grade9"){ echo "Selected"; } ?> >Grade 9</option>
+                                                <option value="grade10" <?php if($Grade == "grade10"){ echo "Selected"; } ?> >Grade 10</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-lg-3">
+                                            <label for="">Marks</label>
+                                            <input type="text" name="marks" id="marks" class="form-control" value="<?php echo $Marks ?>" required>
+                                        </div>
+                                        <div class="form-group col-lg-2" style="display: grid;align-items:  flex-end;">
+                                            <input type="submit" name="submit" id="submit" class="btn btn-primary" value="Update">
+                                        </div>
+                                </div>
+                            </form>
+            <?php 
+                    }
+                }
+            ?>
+        </div>
+    </section>
 </body>
+
 </html>
